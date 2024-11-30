@@ -47,7 +47,7 @@
   "identifier": "com.tauri-nextjs-template.dev",
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDc3M0ZDMjY5NzU2MkM0MTAKUldRUXhHSjFhY0kvZDlpZk43WWVvYkZCOWdvL2xycUk5b210ZU1LNU1JbGlrdVo0Y1Bkd2IrRWIK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVDRjhEMkVBOTlCMzNGN0YKUldSL1A3T1o2dEw0N05kRGJENHVqbnAxaUJVVjNBTGJCeWJEZTR5WEcwUEhMcjlaL2Q0OVhESGQK",
       "endpoints": [ 
         "https://github.com/mikerashoo/tauri-nextjs-template/releases/latest/download/latest.json"
       ]

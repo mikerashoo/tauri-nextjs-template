@@ -45,6 +45,11 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install # Install dependencies using pnpm.
 
+      # Set up signing environment variable for macOS
+      - name: Set up Tauri signing 
+        run: echo "TAURI_SIGNING_PRIVATE_KEY=${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" >> $GITHUB_ENV
+
+
       # Build the Tauri app
       - name: Build the app
         run: | 
@@ -66,6 +71,21 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: |
           zip -r app-windows.zip src-tauri/target/release/bundle/windows/*
+      
+      # Upload the zip files as artifacts for later use
+      - name: Upload macOS ZIP
+        if: matrix.platform == 'macos-latest'
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-macos.zip
+          path: app-macos.zip
+
+      - name: Upload Windows ZIP
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-windows.zip
+          path: app-windows.zip
 
 
       - uses: tauri-apps/tauri-action@v0
