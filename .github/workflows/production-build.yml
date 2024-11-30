@@ -51,7 +51,7 @@ jobs:
 
       # Build the Tauri app
       - name: Build the app
-        run: pnpm tauri build --release
+        run: pnpm tauri build
 
       # Archive macOS and Windows builds into .zip files
       - name: Archive macOS build
