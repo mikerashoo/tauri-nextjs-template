@@ -23,8 +23,7 @@
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": "",
-      "signingIdentity": null
+      "timestampUrl": ""
     },
     "longDescription": "",
     "macOS": {
@@ -51,7 +50,10 @@
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVDRjhEMkVBOTlCMzNGN0YKUldSL1A3T1o2dEw0N05kRGJENHVqbnAxaUJVVjNBTGJCeWJEZTR5WEcwUEhMcjlaL2Q0OVhESGQK",
       "endpoints": [ 
         "https://github.com/mikerashoo/tauri-nextjs-template/releases/latest/download/latest.json"
-      ]
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
     }
   },
   "app": {
