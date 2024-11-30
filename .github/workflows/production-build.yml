@@ -21,8 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
-          cache: pnpm
+          node-version: lts/* 
 
       # Set up Rust (Tauri dependency)
       - name: Set up Rust
@@ -34,7 +33,10 @@ jobs:
       
       - name: install pnpm
         run: npm install -g pnpm
-        
+      
+      - name: install frontend dependencies
+        run: pnpm install # Install dependencies using pnpm.
+      
       - name: check formatting
         run: pnpm format:check
 
