@@ -33,7 +33,7 @@ jobs:
 
       # Build the Tauri app
       - name: Build the app
-        run: npm run tauri build
+        run: pnpm tauri build
 
       # Generate the latest.json
       - name: Generate latest.json
