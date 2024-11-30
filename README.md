@@ -1,6 +1,6 @@
-# Next.js Template with pnpm, TailwindCSS, and TypeScript
+# Next.js and Tauri Template with pnpm, TailwindCSS, and TypeScript
 
-This is a customizable Next.js template set up with **pnpm**, **TailwindCSS**, and **TypeScript**. It includes a well-structured `src` folder to streamline development for modern web applications.
+This is a customizable Next.js and Tauri v2 template set up with **pnpm**, **TailwindCSS**, and **TypeScript**. It includes a well-structured `src` folder to streamline development for modern web applications.
 
 ---
 
@@ -18,9 +18,9 @@ This is a customizable Next.js template set up with **pnpm**, **TailwindCSS**, a
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url> your-project-name
+   git clone https://github.com/mikerashoo/tauri-nextjs-template your-project-name
    cd your-project-name
 2. Run pnpm commands
     ```bash
     pnpm install
-    pnpm dev
+    pnpm tauri dev
