@@ -44,10 +44,10 @@ jobs:
             "pub_date": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
             "platforms": {
               "darwin-aarch64": {
-                "url": "https://github.com/username/repository/releases/download/v1.0.1/app-macos.zip"
+                "url": "https://github.com/mikeraashoo/tauri-nextjs-template/releases/download/v1.0.1/app-macos.zip"
               },
               "windows-x86_64": {
-                "url": "https://github.com/username/repository/releases/download/v1.0.1/app-windows.zip"
+                "url": "https://github.com/mikeraashoo/tauri-nextjs-template/releases/download/v1.0.1/app-windows.zip"
               }
             }
           }' > latest.json
