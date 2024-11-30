@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm-based Macs (M1 and above).
-            args: '--target aarch64-apple-darwin' 
+          # - platform: 'macos-latest' # for Arm-based Macs (M1 and above).
+          #   args: '--target aarch64-apple-darwin' 
           - platform: 'windows-latest'
             args: ''
 
@@ -45,8 +45,7 @@ jobs:
         run: pnpm install # Install dependencies using pnpm.
 
       # Set up Tauri signing only for macOS
-      - name: Set up Tauri signing for macOS
-        if: matrix.platform == 'macos-latest'
+      - name: Set up Tauri signing for macOS 
         run: echo "TAURI_SIGNING_PRIVATE_KEY=${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" >> $GITHUB_ENV
 
       # Build the Tauri app
