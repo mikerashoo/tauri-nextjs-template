@@ -1,4 +1,4 @@
-name: Publish Tauri App
+name: Build Tauri App for Updater
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  build-and-release:
-    runs-on: ${{ matrix.platform }}
+  build-tauri:
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -17,86 +17,56 @@ jobs:
       # Checkout the repository
       - uses: actions/checkout@v4
 
-      # Set up Node.js
+      # Set up Node.js (for frontend dependencies)
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/* 
+          node-version: lts/*
 
       # Set up Rust (Tauri dependency)
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          # Those targets are only used on macOS runners, so it's in an `if` to slightly speed up Windows builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      
-      - name: install pnpm
-        run: npm install -g pnpm
-      
-      - name: install frontend dependencies
-        run: pnpm install # Install dependencies using pnpm.
-
-      - name: build
-        run: pnpm build
-
-      # Generate the latest.json
-      - name: Generate latest.json
+      # Install frontend dependencies
+      - name: Install frontend dependencies
         run: |
-          echo '{
-            "version": "1.0.1",
-            "notes": "Bug fixes and performance improvements.",
-            "pub_date": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-            "platforms": {
-              "darwin-aarch64": {
-                "url": "https://github.com/mikeraashoo/tauri-nextjs-template/releases/download/v1.0.1/app-macos.zip"
-              },
-              "windows-x86_64": {
-                "url": "https://github.com/mikeraashoo/tauri-nextjs-template/releases/download/v1.0.1/app-windows.zip"
-              }
-            }
-          }' > latest.json
+          npm install -g pnpm
+          pnpm install
 
-      # Create a release
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v1.0.1
-          release_name: App v1.0.1
-          body: Bug fixes and performance improvements.
-          draft: false
-          prerelease: false
+      # Build the Tauri app
+      - name: Build the app
+        run: |
+          # Build the app for the specific platform
+          if [[ $RUNNER_OS == "Linux" ]]; then
+            npm run tauri build -- --target x86_64-unknown-linux-gnu
+          elif [[ $RUNNER_OS == "macOS" ]]; then
+            npm run tauri build -- --target aarch64-apple-darwin
+          elif [[ $RUNNER_OS == "Windows" ]]; then
+            npm run tauri build -- --target x86_64-pc-windows-msvc
+          fi
 
-      # Upload assets (e.g., app binaries and latest.json)
-      - name: Upload macOS App Binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: path/to/app-macos.zip
-          asset_name: app-macos.zip
-          asset_content_type: application/zip
+      # Archive macOS and Windows builds into .zip files
+      - name: Archive macOS build
+        if: matrix.platform == 'macos-latest'
+        run: |
+          zip -r app-macos.zip src-tauri/target/release/bundle/macos/*
 
-      - name: Upload Windows App Binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: path/to/app-windows.zip
-          asset_name: app-windows.zip
-          asset_content_type: application/zip
+      - name: Archive Windows build
+        if: matrix.platform == 'windows-latest'
+        run: |
+          zip -r app-windows.zip src-tauri/target/release/bundle/windows/*
 
-      - name: Upload latest.json
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Upload the zip files as artifacts for later use
+      - name: Upload macOS ZIP
+        if: matrix.platform == 'macos-latest'
+        uses: actions/upload-artifact@v3
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: latest.json
-          asset_name: latest.json
-          asset_content_type: application/json
+          name: app-macos.zip
+          path: app-macos.zip
+
+      - name: Upload Windows ZIP
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-windows.zip
+          path: app-windows.zip
