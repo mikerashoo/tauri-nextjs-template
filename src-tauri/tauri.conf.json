@@ -23,7 +23,8 @@
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": ""
+      "timestampUrl": "",
+      "signingIdentity": null
     },
     "longDescription": "",
     "macOS": {

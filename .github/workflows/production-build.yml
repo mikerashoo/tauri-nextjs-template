@@ -30,11 +30,10 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          # Those targets are only used on macOS runners, so it's in an `if` to slightly speed up Windows builds.
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
+        if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
@@ -45,17 +44,16 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install # Install dependencies using pnpm.
 
-      # Set up signing environment variable for macOS
-      - name: Set up Tauri signing 
+      # Set up Tauri signing only for macOS
+      - name: Set up Tauri signing for macOS
+        if: matrix.platform == 'macos-latest'
         run: echo "TAURI_SIGNING_PRIVATE_KEY=${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" >> $GITHUB_ENV
-
 
       # Build the Tauri app
       - name: Build the app
-        run: pnpm tauri build
- 
+        run: pnpm tauri build --release
 
-       # Archive macOS and Windows builds into .zip files
+      # Archive macOS and Windows builds into .zip files
       - name: Archive macOS build
         if: matrix.platform == 'macos-latest'
         run: |
@@ -79,7 +77,6 @@ jobs:
         with:
           name: app-windows.zip
           path: app-windows.zip
-
 
       - uses: tauri-apps/tauri-action@v0
         env:
