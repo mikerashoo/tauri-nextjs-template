@@ -7,6 +7,7 @@
     "devUrl": "http://localhost:3000"
   },
   "bundle": {
+    "createUpdaterArtifacts": true,
     "active": true,
     "category": "DeveloperTool",
     "copyright": "",
@@ -44,7 +45,14 @@
   "mainBinaryName": "nextjs-pnpm-template",
   "version": "0.1.0",
   "identifier": "com.tauri-nextjs-template.dev",
-  "plugins": {},
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE0MEYxQjg1QzM5QUVDRTYKUldUbTdKckRoUnNQcEJsblRHUTY2WHF1L1dhL09jOG5pRFBxVHNuV3BCVEpyWGQyYXd2Z0c3bTEK",
+      "endpoints": [ 
+        "https://github.com/mikerashoo/tauri-nextjs-template/releases/latest/download/latest.json"
+      ]
+    }
+  },
   "app": {
     "windows": [
       {

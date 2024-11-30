@@ -1,4 +1,4 @@
-name: 'publish'
+name: Publish Tauri App
 
 on:
   push:
@@ -6,52 +6,92 @@ on:
       - main
 
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: 'macos-latest' # for Arm-based Macs (M1 and above).
-            args: '--target aarch64-apple-darwin' 
-          - platform: 'windows-latest'
-            args: ''
+  build-and-release:
+    runs-on: ubuntu-latest
 
-    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        platform: [macos-latest, windows-latest]
+
     steps:
+      # Checkout the repository
       - uses: actions/checkout@v4
 
-      - name: setup node
+      # Set up Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
-      - name: install Rust stable
+      # Set up Rust (Tauri dependency)
+      - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          # Those targets are only used on macOS runners, so it's in an `if` to slightly speed up Windows builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install -g pnpm && pnpm install
+
+      # Build the Tauri app
+      - name: Build the app
+        run: npm run tauri build
+
+      # Generate the latest.json
+      - name: Generate latest.json
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          echo '{
+            "version": "1.0.1",
+            "notes": "Bug fixes and performance improvements.",
+            "pub_date": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "platforms": {
+              "darwin-aarch64": {
+                "url": "https://github.com/username/repository/releases/download/v1.0.1/app-macos.zip"
+              },
+              "windows-x86_64": {
+                "url": "https://github.com/username/repository/releases/download/v1.0.1/app-windows.zip"
+              }
+            }
+          }' > latest.json
 
-      - name: install pnpm
-        run: npm install -g pnpm
-
-      - name: install frontend dependencies
-        run: pnpm install # Install dependencies using pnpm.
-
-      - uses: tauri-apps/tauri-action@v0
+      # Create a release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: app-v__VERSION__ # The action automatically replaces __VERSION__ with the app version.
-          releaseName: 'App v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
+          tag_name: v1.0.1
+          release_name: App v1.0.1
+          body: Bug fixes and performance improvements.
+          draft: false
           prerelease: false
-          args: ${{ matrix.args }}
+
+      # Upload assets (e.g., app binaries and latest.json)
+      - name: Upload macOS App Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: path/to/app-macos.zip
+          asset_name: app-macos.zip
+          asset_content_type: application/zip
+
+      - name: Upload Windows App Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: path/to/app-windows.zip
+          asset_name: app-windows.zip
+          asset_content_type: application/zip
+
+      - name: Upload latest.json
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: latest.json
+          asset_name: latest.json
+          asset_content_type: application/json
