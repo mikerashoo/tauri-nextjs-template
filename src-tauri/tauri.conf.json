@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "pnpm build",
+    "beforeDevCommand": "pnpm dev",
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000"
   },
@@ -43,7 +43,7 @@
   },
   "productName": "nextjs-pnpm-template",
   "mainBinaryName": "nextjs-pnpm-template",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "identifier": "com.tauri-nextjs-template.dev",
   "plugins": {
     "updater": {

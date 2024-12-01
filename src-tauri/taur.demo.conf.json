@@ -1,0 +1,74 @@
+{
+    "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+    "build": {
+      "beforeBuildCommand": "pnpm build",
+      "beforeDevCommand": "pnpm dev",
+      "frontendDist": "../out",
+      "devUrl": "http://localhost:3000"
+    },
+    "bundle": {
+      "createUpdaterArtifacts": true,
+      "active": true,
+      "category": "DeveloperTool",
+      "copyright": "",
+      "targets": "all",
+      "externalBin": [],
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      },
+      "longDescription": "",
+      "macOS": {
+        "entitlements": null,
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "resources": [],
+      "shortDescription": "",
+      "linux": {
+        "deb": {
+          "depends": []
+        }
+      }
+    },
+    "productName": "nextjs-demo-template",
+    "mainBinaryName": "nextjs-demo-template",
+    "version": "1.1.0",
+    "identifier": "com.tauri-demo-template.dev",
+    "plugins": {
+      "updater": {
+        "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVDRjhEMkVBOTlCMzNGN0YKUldSL1A3T1o2dEw0N05kRGJENHVqbnAxaUJVVjNBTGJCeWJEZTR5WEcwUEhMcjlaL2Q0OVhESGQK",
+        "endpoints": [ 
+          "https://github.com/mikerashoo/tauri-nextjs-template/releases/latest/download/latest.json"
+        ],
+        "windows": {
+          "installMode": "passive"
+        }
+      }
+    },
+    "app": {
+      "windows": [
+        {
+          "fullscreen": false,
+          "height": 600,
+          "resizable": true,
+          "title": "nextjs-pnpm-template",
+          "width": 800,
+          "useHttpsScheme": true
+        }
+      ],
+      "security": {
+        "csp": null
+      }
+    }
+  }
