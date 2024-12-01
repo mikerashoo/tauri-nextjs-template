@@ -1,73 +1,83 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import { check } from '@tauri-apps/plugin-updater';
-import { relaunch } from '@tauri-apps/plugin-process';
-import { useEffect, useState } from "react"; 
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
+import { useEffect, useState } from "react";
 import MainWindowLoading from "@/components/layouts/MainWindowLoading";
 
-type UpdateStatus = "checking" | "downloading" | "updating" | "done" | "no_update";
-
 export default function App({ Component, pageProps }: AppProps) {
+  const [updateMessage, setUpdateMessage] = useState<string>(
+    "checking For Update"
+  );
+  const [isUpdating, setIsUpdating] = useState<boolean>(true);
+  const [isUpdated, setIsUpdated] = useState<boolean>(false);
+  const [updateProgress, setUpdateProgress] = useState<number>(0);
 
-  const [updateStatus, setUpdateStatus] = useState<UpdateStatus>("checking")
+  useEffect(() => {
+    const checkUpdate = async () => {
+      const update = await check();
+      console.log("update", update);
 
- 
-useEffect(() => {
- 
-   const checkUpdate = async () => { 
-    
-    const update =await check()
-    console.log("update", update)
+      if (update) {
+        console.log(
+          `found update ${update.version} from ${update.date} with notes ${update.body}`
+        );
+        setUpdateMessage(
+          `found update ${update.version} from ${update.date} with notes ${update.body}`
+        );
+        let downloaded = 0;
+        let contentLength = 0;
+        // alternatively we could also call update.download() and update.install() separately
+        await update.downloadAndInstall((event) => {
+          switch (event.event) {
+            case "Started":
+              contentLength = event.data.contentLength as number;
+              setUpdateMessage(
+                `started downloading ${event.data.contentLength} bytes`
+              );
+              break;
+            case "Progress":
+              downloaded += event.data.chunkLength;
+              setUpdateMessage(
+                `downloaded ${downloaded} from ${contentLength}`
+              );
+              setUpdateProgress((downloaded / contentLength) * 100);
+              break;
+            case "Finished":
+              setUpdateProgress(100);
+              setUpdateMessage("download finished");
+              break;
+          }
+        });
 
-    if (update) { 
-      console.log(
-        `found update ${update.version} from ${update.date} with notes ${update.body}`
-      );
-      let downloaded = 0;
-      let contentLength = 0;
-      // alternatively we could also call update.download() and update.install() separately
-      await update.downloadAndInstall((event) => {
-        switch (event.event) {
-          case 'Started':
-            setUpdateStatus("downloading")
-            contentLength = event.data.contentLength as number;
-            console.log(`started downloading ${event.data.contentLength} bytes`);
-            break;
-          case 'Progress':
-            setUpdateStatus("updating")
-            downloaded += event.data.chunkLength;
-            console.log(`downloaded ${downloaded} from ${contentLength}`);
-            break;
-          case 'Finished':
-            setUpdateStatus("done")
-            console.log('download finished');
-            break;
-        }
-      });
-    
-      console.log('update installed');
-      await relaunch();
-    }
-    else {
+        console.log("update installed");
+        setIsUpdated(true);
+      } else {
+        setIsUpdating(false);
+      }
+    };
 
-      setUpdateStatus("no_update")
-    }
-   };
+    setTimeout(() => {
+      checkUpdate();
+    }, 1000);
+  }, []);
 
-   setTimeout(() => {
-   checkUpdate();
-    
-   }, 1000);
-}, [])
+  const restartRequest = async () => await relaunch();
 
-const updatingGoingStatuses: UpdateStatus[] = ["checking", "downloading", "updating"]
+  if (isUpdating || isUpdated) {
+    return (
+      <MainWindowLoading>
+        <div>
+          <h1>{updateMessage}</h1>
+          {updateProgress > 0 && <p>Progress {updateProgress}</p>}
 
-
-if(updatingGoingStatuses.includes(updateStatus)){
-  return <MainWindowLoading>
-   <div><h1>Update Checking : {updateStatus}</h1></div>
-  </MainWindowLoading>
-}
+          {isUpdated && (
+            <button onClick={restartRequest}>Restart Application</button>
+          )}
+        </div>
+      </MainWindowLoading>
+    );
+  }
 
   return <Component {...pageProps} />;
 }

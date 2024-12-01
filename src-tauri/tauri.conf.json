@@ -43,7 +43,7 @@
   },
   "productName": "nextjs-pnpm-template",
   "mainBinaryName": "nextjs-pnpm-template",
-  "version": "1.1.7",
+  "version": "2.1.8",
   "identifier": "com.tauri-nextjs-template.dev",
   "plugins": {
     "updater": {

@@ -12,7 +12,7 @@ function MainWindowLoading(props?: PropsWithChildren) {
     }, [])
     
   return (
-    <div className='w-screen h-screen bg-orange-400 items-center justify-center flex flex-col'>
+    <div className='w-screen h-screen bg-yellow-400 items-center justify-center flex flex-col'>
         <Logo />
 
 {props?.children}
